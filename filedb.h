@@ -66,8 +66,8 @@ public:
 						if (flag)
 							resultSet.push_back(temp);
 					}
-					readFile.close();
 				}
+				readFile.close();
 			}
 			return resultSet.size();
 		}//捕获文件操作异常，返回-1
