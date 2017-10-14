@@ -178,6 +178,9 @@ begin:
 		}
 		ORM_CPP += "else {\nthrow \"Field  Not Found!\";\n}\n}\n";
 	}
+	else {
+		ORM_CPP += "float getFloatElemByName(string Elem){\n return 1; \n}\n";
+	}
 
 	first = "";
 	for (int i = 0; i < FIELD_VALUE.size(); i++) {
@@ -195,6 +198,9 @@ begin:
 			}
 		}
 		ORM_CPP += "else {\nthrow \"Field  Not Found!\";\n}\n}\n";
+	}
+	else {
+		ORM_CPP += "char* getCharElemByName(string Elem){\n return ""; \n}\n";
 	}
 	ORM_CPP += "};\n";
 

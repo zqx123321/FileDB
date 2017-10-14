@@ -1,7 +1,7 @@
-# <center>二进制文件数据库系统FileDB使用说明文档（C++版）</center>
+# <center>二进制文件存储系统FileDB使用说明文档（C++版）V2.0</center>
 
 ## 一.说明：
-&ensp;&ensp;&ensp;&ensp;FileDB为一款C++开发的数据库系统，基于二进制文件，支持数据库基本的增删改查（CRUD）操作，并且可以多条件查询，自动生成对象关系映射（ORM）等。在此基础上可以轻松实现MVC设计模式以及UI、DAL、DLL三层架构。
+&ensp;&ensp;&ensp;&ensp;FileDB为一款C++开发的类数据库系统，基于二进制文件，支持数据库基本的增删改查（CRUD）操作，并且可以多条件查询，模糊查询，自动生成对象关系映射（ORM）等。在此基础上可以轻松实现MVC设计模式以及UI、DAL、DLL三层架构。
 ## 二.使用方法
 #### 1.初始建表
 &ensp;&ensp;&ensp;&ensp; 初始使用请使用CreateTable.exe建立数据库表，表中字段支持int、float、char*三种类型，最多可设置10个字段，且必须有id字段作为主键。按照提示完成操作后， 系统会自动生成三个文件：.cpp为系统自动生成的实体类，为数据库中表的映射，两个.dat为数据存储文件。将这三个文件连同FileDB.cpp一起导入到工程中即可使用了。
@@ -9,22 +9,24 @@
 插入数据的函数原型为：
 ```C++
 template<typename T>
-static int insert(string DB_NAME, T& entity)
+static int insert(string DB_NAME, vector<T>& entity)
 ```
-其中，DB_NAME为表名，entity为待增加实体，函数操作成功，返回受影响的行数，操作失败，返回-1。
+其中，DB_NAME为表名，entity为待增加实体数组，可以一次性增加多条数据，函数操作成功，返回受影响的行数，操作失败，返回-1。
 调用方法：
 ```C++
+vector<Person>entity;
 Person person;
 person.setName("小张");
 person.setAge(20);
 person.setHeight(150.5);
-int res = FileDB::insert("person", person);
+entity.push_back(person);
+int res = FileDB::insert("person", entity);
 if (res > 0) {
 	//success
 }
 ```
-#### 2.检索数据
-检索数据的函数原型为：
+#### 2.查询数据（精确）
+查询数据的函数原型为：
 ```C++
 template<typename T>
 static int select(string DB_NAME, T& entity, vector<string>& VALUES, vector<T>& resultSet)
@@ -53,7 +55,23 @@ for (int i = 0; i < res.size(); i++) {
     cout << res[i].id << " " << res[i].age << " " << res[i].height << " " << res[i].name << endl;
 }
 ```
-#### 3.删除数据
+#### 3.查询数据（模糊）
+模糊查询的函数原型为：
+```C++
+template<typename T>
+static int selectLike(string DB_NAME, string valueName,char* value, vector<T>& resultSet)
+```
+目前仅支持字符串的模糊查询，其中DB_NAME为表名，valueName是字段名称，value是模糊查询条件，resultSet为结果集，函数操作成功，返回受影响的行数，操作失败，返回-1。
+调用方法：
+```C++
+//查找姓名中含有“张”的
+vector<Person>res;
+FileDB::selectLike("person", "name", "张", res);
+for (int i = 0; i < res.size(); i++) {
+	cout << res[i].id<<" "<< res[i].name << " " << res[i].age << endl;
+}
+```
+#### 4.删除数据
 删除数据的函数原型为：
 ```C++
 template<typename T>
@@ -81,7 +99,7 @@ if (res > 0) {
 	//success
 }
 ```
-#### 3.修改数据
+#### 5.修改数据
 修改数据的函数原型为：
 ```C++
 template<typename T>
@@ -104,3 +122,9 @@ if (res > 0) {
 	//success
 }
 ```
+#### V2.0更新说明：  
+1、增加了模糊查询功能  
+2、增加了批量添加数据的功能
+3、修复了当id%256==26时，出现文档结束标记EOF导致数据读取不完整的bug  
+4、增加了单条件查询的加速算法，id查询的加速算法，查询速度显著提高
+5、运用了记忆化搜索的方法，处理多条件查询过程，查询速度明显提高
