@@ -55,7 +55,7 @@ for (int i = 0; i < res.size(); i++) {
     cout << res[i].id << " " << res[i].age << " " << res[i].height << " " << res[i].name << endl;
 }
 ```
-#### 3.查询数据（模糊）
+#### 3.模糊查询（基于子串）
 模糊查询的函数原型为：
 ```C++
 template<typename T>
@@ -71,7 +71,25 @@ for (int i = 0; i < res.size(); i++) {
 	cout << res[i].id<<" "<< res[i].name << " " << res[i].age << endl;
 }
 ```
-#### 4.删除数据
+
+#### 4.模糊查询（基于正则表达式）
+模糊查询的函数原型为：
+```C++
+template<typename T>
+static int selectRegex(string DB_NAME, string valueName, regex& rx, vector<T>& resultSet)
+```
+目前仅支持字符串的模糊查询，其中DB_NAME为表名，valueName是字段名称，rx字符串匹配的正则表达式，resultSet为结果集，函数操作成功，返回受影响的行数，操作失败，返回-1。
+调用方法：
+```C++
+//查找姓名中含有“小...明”的
+vector<Person>res;
+regex rx(".*小.*明.*");
+FileDB::selectRegex("person", "name", rx, res);
+for (int i = 0; i < res.size(); i++) {
+	cout << res[i].id<<" "<< res[i].name << " " << res[i].age << endl;
+}
+```
+#### 5.删除数据
 删除数据的函数原型为：
 ```C++
 template<typename T>
@@ -99,7 +117,7 @@ if (res > 0) {
 	//success
 }
 ```
-#### 5.修改数据
+#### 6.修改数据
 修改数据的函数原型为：
 ```C++
 template<typename T>
@@ -126,5 +144,8 @@ if (res > 0) {
 1、增加了模糊查询功能  
 2、增加了批量添加数据的功能
 3、修复了当id%256==26时，出现文档结束标记EOF导致数据读取不完整的bug  
-4、增加了单条件查询的加速算法，id查询的加速算法，查询速度显著提高
+4、增加了单条件查询的加速算法，id查询的加速算法，查询速度显著提高  
 5、运用了记忆化搜索的方法，处理多条件查询过程，查询速度明显提高
+
+#### V3.0更新说明：  
+1、增加了基于正则表达式的模糊查询
