@@ -8,6 +8,7 @@ using namespace std;
 #include<string>
 #include<vector>
 #include<fstream>
+#include<regex>
 //数据库CRUD操作方法封装
 class FileDB
 {
@@ -174,7 +175,7 @@ public:
 		}
 	}
 
-	//字符串的模糊查询
+	//字符串的模糊查询，基于子串的模糊查询
 	template<typename T>
 	static int selectLike(string DB_NAME, string valueName,char* value, vector<T>& resultSet) {
 		ifstream readFile;
@@ -199,6 +200,37 @@ public:
 		}
 
 	}
+	
+
+	//字符串的模糊查询，基于正则表达式的模糊查询
+	template<typename T>
+	static int selectRegex(string DB_NAME, string valueName, regex& rx, vector<T>& resultSet) {
+		ifstream readFile;
+		try {
+			T temp;
+			int TSize = sizeof(temp);
+			readFile.open(DB_NAME + ".dat", ios::in | ios::out | ios::binary);
+			if (!readFile) {
+				ios_base::failure fail("ERROR");
+				throw fail;
+			}
+			while (readFile.read(reinterpret_cast<char*>(&temp), TSize)) {
+				if (temp.id != -1 ) {
+					const char * value = temp.getCharElemByName(valueName);
+					cmatch narrowMatch;
+					if (regex_match(value, value+strlen(value), narrowMatch, rx) == 1)
+						resultSet.push_back(temp);
+				}
+			}
+			return resultSet.size();
+		}
+		catch (ios_base::failure &fail) {
+			cout << fail.what() << endl;
+			return -1;
+		}
+
+	}
+
 	//增加数据，DB_NAME为表名，entity为待增加实体
 	//操作成功，返回受影响的行数，操作失败，返回-1
 	template<typename T>
