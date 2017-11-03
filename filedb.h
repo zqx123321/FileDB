@@ -32,7 +32,7 @@ public:
 			if (VALUES[0] == "all") {
 				while (readFile.read(reinterpret_cast<char*>(&temp), TSize)) {
 					//去除id为-1的无效数据
-					if (temp.id != -1)
+					if (!temp.dirty)
 						resultSet.push_back(temp);
 				}
 			}
@@ -73,7 +73,7 @@ public:
 		T temp;
 		int TSize = sizeof(T);
 		while (readFile.read(reinterpret_cast<char*>(&temp), TSize)) {
-			if (temp.id != -1 && temp.getIntElemByName(valueName) == value) {
+			if (!temp.dirty && temp.getIntElemByName(valueName) == value) {
 				resultSet.push_back(temp);
 			}
 		}
@@ -84,7 +84,7 @@ public:
 		T temp;
 		int TSize = sizeof(T);
 		while (readFile.read(reinterpret_cast<char*>(&temp), TSize)) {
-			if (temp.id != -1 && !strcmp(temp.getCharElemByName(valueName),value)) {
+			if (!temp.dirty && !strcmp(temp.getCharElemByName(valueName),value)) {
 				resultSet.push_back(temp);
 			}
 		}
@@ -95,7 +95,7 @@ public:
 		T temp;
 		int TSize = sizeof(T);
 		while (readFile.read(reinterpret_cast<char*>(&temp), TSize)) {
-			if (temp.id != -1 && temp.getFloatElemByName(valueName) == value) {
+			if (!temp.dirty && temp.getFloatElemByName(valueName) == value) {
 				resultSet.push_back(temp);
 			}
 		}
@@ -145,7 +145,7 @@ public:
 		}
 
 		while (readFile.read(reinterpret_cast<char*>(&temp), TSize)) {
-			if (temp.id != -1) {
+			if (!temp.dirty) {
 				int flag = 1;
 				//遍历选择条件
 				for (int i = 1; i < VALUES.size(); i++) {
@@ -188,7 +188,7 @@ public:
 				throw fail;
 			}
 			while (readFile.read(reinterpret_cast<char*>(&temp), TSize)) {
-				if (temp.id != -1 && strstr(temp.getCharElemByName(valueName), value)) {
+				if (!temp.dirty != -1 && strstr(temp.getCharElemByName(valueName), value)) {
 					resultSet.push_back(temp);
 				}
 			}
@@ -215,7 +215,7 @@ public:
 				throw fail;
 			}
 			while (readFile.read(reinterpret_cast<char*>(&temp), TSize)) {
-				if (temp.id != -1 ) {
+				if (!temp.dirty) {
 					const char * value = temp.getCharElemByName(valueName);
 					cmatch narrowMatch;
 					if (regex_match(value, value+strlen(value), narrowMatch, rx) == 1)
@@ -257,6 +257,7 @@ public:
 
 			for (int i = 0; i < entity.size(); i++) {
 				entity[i].setId(id);
+				entity[i].setDirty(0);
 				writeFile.write((char*)&entity[i], sizeof(entity[i]));
 				id++;
 			}
@@ -309,7 +310,7 @@ public:
 			//id加速
 			if (VALUES[1] == "id") {
 				T deleteT;
-				deleteT.setId(-1);
+				deleteT.setDirty(1);
 				writeFile.seekp(entity.getId() * sizeof(deleteT), ios::beg);
 				writeFile.write((char*)&deleteT, sizeof(deleteT));
 				return 1;
@@ -356,7 +357,7 @@ public:
 
 			for (int count = 0; readFile.read(reinterpret_cast<char*>(&temp), TSize); count++) {
 				//去除id为-1的无效数据
-				if (temp.id != -1) {
+				if (!temp.dirty) {
 					int flag = 1;
 					//遍历选择条件
 					for (int i = 1; i < VALUES.size(); i++) {
@@ -385,7 +386,7 @@ public:
 						//移动文件指针，在count * sizeof(entity)出重写数据，将id置为-1
 						writeFile.seekp(count * sizeof(entity), ios::beg);
 						T deleteT;
-						deleteT.setId(-1);
+						deleteT.setDirty(1);
 						writeFile.write((char*)&deleteT, sizeof(deleteT));
 					}
 				}
@@ -463,7 +464,7 @@ public:
 
 			for (int count = 0; readFile.read(reinterpret_cast<char*>(&temp), sizeof(temp)); count++) {
 				//去除id为-1的无效数据
-				if (temp.id != -1) {
+				if (!temp.dirty) {
 					int flag = 1;
 					//遍历选择条件
 					for (int i = 1; i < VALUES.size(); i++) {
@@ -490,6 +491,7 @@ public:
 					if (flag) {
 						//设置id不变
 						Uentity.setId(temp.id);
+						Uentity.setDirty(0);
 						//移动文件指针，在count * sizeof(Sentity)出重写数据
 						writeFile.seekp(count * sizeof(Sentity), ios::beg);
 						writeFile.write((char*)&Uentity, sizeof(Uentity));

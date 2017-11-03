@@ -93,6 +93,8 @@ begin:
 			FIELD_VALUE.push_back("int");
 		}
 	}
+	FIELD_NAME.push_back("dirty");
+	FIELD_VALUE.push_back("int");
 	system("cls");
 	if (!flag) {
 		cout << "当前表不含主键id,不符合规范，请重新创建！";
@@ -119,10 +121,10 @@ begin:
 	string NEW_NAME = first_c + DB_NAME.substr(1);
 
 	string ORM_CPP = "using namespace std;\n#include<string>\nclass "
-		+ NEW_NAME + "{\nprivate:\nstatic const int ";
+		+ NEW_NAME + "{\nprivate:\n";
 
 	for (int i = 0; i < FIELD_SIZE.size(); i++) {
-		ORM_CPP += FIELD_SIZE[i].first + "_SIZE";
+		ORM_CPP += "static const int "+FIELD_SIZE[i].first + "_SIZE";
 		stringstream ss;
 		string str;
 		ss << FIELD_SIZE[i].second;
@@ -204,7 +206,7 @@ begin:
 	}
 	ORM_CPP += "};\n";
 
-	writeFile.open(DB_NAME + ".cpp");
+	writeFile.open(DB_NAME + ".h");
 	writeFile << ORM_CPP;
 	writeFile.close();
 	cout << "表" + DB_NAME + "创建成功，关系映射创建成功！" << endl;
