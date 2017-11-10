@@ -1,4 +1,4 @@
-﻿# <center>二进制文件存储系统FileDB使用说明文档（C++版）V3.0</center>
+﻿# <center>二进制文件存储系统FileDB使用说明文档（C++版）V4.0</center>
 
 ## 一.说明：
 &ensp;&ensp;&ensp;&ensp;FileDB为一款C++开发的类数据库系统，基于二进制文件，支持数据库基本的增删改查（CRUD）操作，并且可以多条件查询，模糊查询，自动生成对象关系映射（ORM）等。在此基础上可以轻松实现MVC设计模式以及UI、DAL、DLL三层架构。
